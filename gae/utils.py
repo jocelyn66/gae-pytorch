@@ -55,13 +55,14 @@ def parse_index_file(filename):
 def sparse_to_tuple(sparse_mx):
     if not sp.isspmatrix_coo(sparse_mx):
         sparse_mx = sparse_mx.tocoo()
-    coords = np.vstack((sparse_mx.row, sparse_mx.col)).transpose()
+    coords = np.vstack((sparse_mx.row, sparse_mx.col)).transpose()  # 坐标
     values = sparse_mx.data
     shape = sparse_mx.shape
     return coords, values, shape
 
 
 def mask_test_edges(adj):
+    # neg:
     # Function to build test set with 10% positive links
     # NOTE: Splits are randomized and results might slightly deviate from reported numbers in the paper.
     # TODO: Clean up.
@@ -72,7 +73,7 @@ def mask_test_edges(adj):
     # Check that diag is zero:
     assert np.diag(adj.todense()).sum() == 0
 
-    adj_triu = sp.triu(adj)
+    adj_triu = sp.triu(adj)  # 上三角
     adj_tuple = sparse_to_tuple(adj_triu)
     edges = adj_tuple[0]
     edges_all = sparse_to_tuple(adj)[0]
@@ -137,7 +138,7 @@ def mask_test_edges(adj):
 
     # Re-build adj matrix
     adj_train = sp.csr_matrix((data, (train_edges[:, 0], train_edges[:, 1])), shape=adj.shape)
-    adj_train = adj_train + adj_train.T
+    adj_train = adj_train + adj_train.T   #对称
 
     # NOTE: these edge lists only contain single direction of edge!
     return adj_train, train_edges, val_edges, val_edges_false, test_edges, test_edges_false

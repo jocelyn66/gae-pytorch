@@ -4,6 +4,12 @@ import torch.nn.functional as F
 
 
 def loss_function(preds, labels, mu, logvar, n_nodes, norm, pos_weight):
+    """
+    cost:
+    - norm: 当标签特别稀疏时，起到平衡作用，这有利于优化稳定/收敛
+    - pos_weight: 当标签不平衡时
+    KLD: 符合先验分布
+    """
     cost = norm * F.binary_cross_entropy_with_logits(preds, labels, pos_weight=pos_weight)
 
     # see Appendix B from VAE paper:

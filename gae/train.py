@@ -9,9 +9,9 @@ import scipy.sparse as sp
 import torch
 from torch import optim
 
-from gae.model import GCNModelVAE
-from gae.optimizer import loss_function
-from gae.utils import load_data, mask_test_edges, preprocess_graph, get_roc_score
+from model import GCNModelVAE
+from optimizer import loss_function
+from utils import load_data, mask_test_edges, preprocess_graph, get_roc_score
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--model', type=str, default='gcn_vae', help="models used")
@@ -37,15 +37,17 @@ def gae_for(args):
     adj_orig.eliminate_zeros()
 
     adj_train, train_edges, val_edges, val_edges_false, test_edges, test_edges_false = mask_test_edges(adj)
-    adj = adj_train
+    adj = adj_train  #######对称，对角线0
 
     # Some preprocessing
     adj_norm = preprocess_graph(adj)
+    print("###3", type(adj_norm))
     adj_label = adj_train + sp.eye(adj_train.shape[0])
     # adj_label = sparse_to_tuple(adj_label)
     adj_label = torch.FloatTensor(adj_label.toarray())
 
     pos_weight = float(adj.shape[0] * adj.shape[0] - adj.sum()) / adj.sum()
+    pos_weight = torch.FloatTensor([pos_weight])
     norm = adj.shape[0] * adj.shape[0] / float((adj.shape[0] * adj.shape[0] - adj.sum()) * 2)
 
     model = GCNModelVAE(feat_dim, args.hidden1, args.hidden2, args.dropout)
@@ -56,7 +58,7 @@ def gae_for(args):
         t = time.time()
         model.train()
         optimizer.zero_grad()
-        recovered, mu, logvar = model(features, adj_norm)
+        recovered, mu, logvar = model(features, adj_norm)  # recovered: 重构A
         loss = loss_function(preds=recovered, labels=adj_label,
                              mu=mu, logvar=logvar, n_nodes=n_nodes,
                              norm=norm, pos_weight=pos_weight)
@@ -64,6 +66,7 @@ def gae_for(args):
         cur_loss = loss.item()
         optimizer.step()
 
+        # valid
         hidden_emb = mu.data.numpy()
         roc_curr, ap_curr = get_roc_score(hidden_emb, adj_orig, val_edges, val_edges_false)
 

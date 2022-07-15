@@ -32,17 +32,16 @@ def gae_for(args):
     n_nodes, feat_dim = features.shape
 
     # Store original adjacency matrix (without diagonal entries) for later
-    adj_orig = adj
-    adj_orig = adj_orig - sp.dia_matrix((adj_orig.diagonal()[np.newaxis, :], [0]), shape=adj_orig.shape)
+    adj_orig = adj  # ndarray
+    adj_orig = adj_orig - sp.dia_matrix((adj_orig.diagonal()[np.newaxis, :], [0]), shape=adj_orig.shape)  # ?
     adj_orig.eliminate_zeros()
 
     adj_train, train_edges, val_edges, val_edges_false, test_edges, test_edges_false = mask_test_edges(adj)
-    adj = adj_train  #######对称，对角线0
+    adj = adj_train
 
-    # Some preprocessing
-    adj_norm = preprocess_graph(adj)
-    print("###3", type(adj_norm))
-    adj_label = adj_train + sp.eye(adj_train.shape[0])
+    # Some preprocessing: 基于adj_train计算
+    adj_norm = preprocess_graph(adj)  # ndarray
+    adj_label = adj_train + sp.eye(adj_train.shape[0])  # (1,1)=1
     # adj_label = sparse_to_tuple(adj_label)
     adj_label = torch.FloatTensor(adj_label.toarray())
 

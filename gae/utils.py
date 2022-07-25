@@ -62,6 +62,7 @@ def sparse_to_tuple(sparse_mx):
 
 
 def mask_test_edges(adj):
+    # pos: 划分边(不包含i-i)
     # neg:
     # Function to build test set with 10% positive links
     # NOTE: Splits are randomized and results might slightly deviate from reported numbers in the paper.
@@ -73,6 +74,7 @@ def mask_test_edges(adj):
     # Check that diag is zero:
     assert np.diag(adj.todense()).sum() == 0
 
+    # pos
     adj_triu = sp.triu(adj)  # 上三角
     adj_tuple = sparse_to_tuple(adj_triu)
     edges = adj_tuple[0]
@@ -89,8 +91,8 @@ def mask_test_edges(adj):
     train_edges = np.delete(edges, np.hstack([test_edge_idx, val_edge_idx]), axis=0)
 
     def ismember(a, b, tol=5):
-        rows_close = np.all(np.round(a - b[:, None], tol) == 0, axis=-1)
-        return np.any(rows_close)
+        rows_close = np.all(np.round(a - b[:, None], tol) == 0, axis=-1)  # 两个坐标
+        return np.any(rows_close)  # 某行
 
     test_edges_false = []
     while len(test_edges_false) < len(test_edges):

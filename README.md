@@ -15,5 +15,6 @@ pip install -r requirements.txt```
 
 ### How to run
 ```bash
+cd gae
 python train.py
 ```

@@ -15,6 +15,7 @@ pip install -r requirements.txt```
 
 ### How to run
 default model: g-vae
+
 use config `--model gae` to run g-ae
 ```bash
 cd gae

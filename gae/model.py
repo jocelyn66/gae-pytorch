@@ -8,6 +8,7 @@ from layers import GraphConvolution
 class GCNModelVAE(nn.Module):
     def __init__(self, input_feat_dim, hidden_dim1, hidden_dim2, dropout):
         super(GCNModelVAE, self).__init__()
+        print('G-VAE model')
         self.gc1 = GraphConvolution(input_feat_dim, hidden_dim1, dropout, act=F.relu)
         self.gc2 = GraphConvolution(hidden_dim1, hidden_dim2, dropout, act=lambda x: x)
         self.gc3 = GraphConvolution(hidden_dim1, hidden_dim2, dropout, act=lambda x: x)
@@ -29,6 +30,24 @@ class GCNModelVAE(nn.Module):
         mu, logvar = self.encode(x, adj)
         z = self.reparameterize(mu, logvar)
         return self.dc(z), mu, logvar
+
+
+# GAE
+class GCNModelAE(nn.Module):
+    def __init__(self, input_feat_dim, hidden_dim1, hidden_dim2, dropout):
+        super(GCNModelAE, self).__init__()
+        print('G-AE model')
+        self.gc1 = GraphConvolution(input_feat_dim, hidden_dim1, dropout, act=F.relu)
+        self.gc2 = GraphConvolution(hidden_dim1, hidden_dim2, dropout, act=lambda x: x)
+        self.dc = InnerProductDecoder(dropout, act=lambda x: x)
+
+    def encode(self, x, adj):
+        hidden1 = self.gc1(x, adj)
+        return self.gc2(hidden1, adj)
+
+    def forward(self, x, adj):
+        z = self.encode(x, adj)
+        return self.dc(z), z, None
 
 
 class InnerProductDecoder(nn.Module):

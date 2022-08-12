@@ -9,12 +9,12 @@ import scipy.sparse as sp
 import torch
 from torch import optim
 
-from model import GCNModelVAE
-from optimizer import loss_function
+from model import GCNModelVAE, GCNModelAE
+from optimizer import loss_function_gae, loss_function_gvae
 from utils import load_data, mask_test_edges, preprocess_graph, get_roc_score
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--model', type=str, default='gcn_vae', help="models used")
+parser.add_argument('--model', type=str, choices=['gae', 'gvae'], default='gvae', help="models used")
 parser.add_argument('--seed', type=int, default=42, help='Random seed.')
 parser.add_argument('--epochs', type=int, default=200, help='Number of epochs to train.')
 parser.add_argument('--hidden1', type=int, default=32, help='Number of units in hidden layer 1.')
@@ -48,8 +48,14 @@ def gae_for(args):
     pos_weight = float(adj.shape[0] * adj.shape[0] - adj.sum()) / adj.sum()
     pos_weight = torch.FloatTensor([pos_weight])
     norm = adj.shape[0] * adj.shape[0] / float((adj.shape[0] * adj.shape[0] - adj.sum()) * 2)
+    
+    if args.model == 'gvae':
+        model = GCNModelVAE(feat_dim, args.hidden1, args.hidden2, args.dropout)
+        loss_function = loss_function_gvae
+    else:
+        model = GCNModelAE(feat_dim, args.hidden1, args.hidden2, args.dropout)
+        loss_function = loss_function_gae
 
-    model = GCNModelVAE(feat_dim, args.hidden1, args.hidden2, args.dropout)
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
 
     hidden_emb = None

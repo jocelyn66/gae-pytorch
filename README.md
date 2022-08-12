@@ -14,6 +14,11 @@ The code in this repo is based on or refers to https://github.com/tkipf/gae, htt
 pip install -r requirements.txt``` 
 
 ### How to run
+default model: g-vae
+use config `--model gae` to run g-ae
 ```bash
+cd gae
 python train.py
+
+python train.py --model gae
 ```

@@ -9,7 +9,7 @@ The code in this repo is based on or refers to https://github.com/tkipf/gae, htt
 
 ### Requirements
 - Python 3.7
-- PyTorch 1.11.0+cu113
+- PyTorch 1.11.0+cu113, install command `pip install torch==1.11.0+cu113 torchvision==0.12.0+cu113 torchaudio==0.11.0 --extra-index-url https://download.pytorch.org/whl/cu113`
 - install requirements via ```
 pip install -r requirements.txt``` 
 

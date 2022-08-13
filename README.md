@@ -8,8 +8,8 @@ T. N. Kipf, M. Welling, [Variational Graph Auto-Encoders](https://arxiv.org/abs/
 The code in this repo is based on or refers to https://github.com/tkipf/gae, https://github.com/tkipf/pygcn and https://github.com/vmasrani/gae_in_pytorch.
 
 ### Requirements
-- Python 3
-- PyTorch 0.4
+- Python 3.7
+- PyTorch 1.11.0+cu113
 - install requirements via ```
 pip install -r requirements.txt``` 
 
